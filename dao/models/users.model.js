@@ -15,6 +15,10 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    password: {
+        type: String, 
+        required: true
+    },
     nickname: {
         type: String,
         default: ''
@@ -27,7 +31,7 @@ const userSchema = new Schema({
     },
     avatar_url: {
         type: String,
-        default: '/avatar_image'
+        default: '/img/avatar_image'
     },
     created_at:{
         type: String,

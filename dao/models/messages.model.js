@@ -23,11 +23,16 @@ const messageSchema = new Schema({
     conversation: {
             type: Schema.Types.ObjectId,
             ref: 'conversations',
-            unique: true
+            unique: true,
+            index: true
     },
     content: {
         type:String,
         created_at: new Date().toLocaleString()
+    },
+    status: {
+        type: String,
+        enum: ['active', 'deleted']
     }
 
 })
@@ -41,7 +46,7 @@ messageSchema.pre('find', function(){
 
 
 messageSchema.pre('findOne', function(){
-    this.populate('reveiver')
+    this.populate('receiver')
 })
 
 messageSchema.plugin(mongoosePaginate)
