@@ -1,6 +1,6 @@
 import MessagesService from '../services/messages.service.js'
-import MessagesDAO from '../dao/messages.dao.js'
-import ConversationsDAO from '../dao/conversations.dao.js'
+import MessagesDAO from '../dao/dbManagers/messages.dao.js'
+import ConversationsDAO from '../dao/dbManagers/conversations.dao.js'
 
 const messagesService = new MessagesService(new MessagesDAO(), new ConversationsDAO())
 

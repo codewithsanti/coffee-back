@@ -1,14 +1,11 @@
-import { model, Schema } from 'mongoose'
+import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
 const messageCollection = 'messages'
 
-const messageSchema = new Schema({
-    _id: {
-        index: true
-    },
+const messageSchema = new mongoose.Schema({
     sender: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
         require: true,
         unique: true,
@@ -16,12 +13,12 @@ const messageSchema = new Schema({
     },
     receivers: [ 
         {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref:'users'
         }
     ],
     conversation: {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'conversations',
             unique: true,
             index: true
@@ -51,4 +48,6 @@ messageSchema.pre('findOne', function(){
 
 messageSchema.plugin(mongoosePaginate)
 
-const messageModel = model(messageCollection, messageSchema)
+const messageModel = mongoose.model(messageCollection, messageSchema)
+
+export default messageModel

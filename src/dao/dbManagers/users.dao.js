@@ -1,27 +1,23 @@
-import userModel from './models/users.model.js'
+import { userModel } from '../models/users.model.js'
 
 export default class usersDAO {
-    constructor(){
-        console.log(`Working users with MongoDB`)
-    }
-
     getUsers = async () => {
         const result = await userModel.find().lean()
         return result
     }
 
     getUserById = async (userId) => {
-        const result = await userModel.findOne({_id: id}).lean()
+        const result = await userModel.findOne({_id: userId}).lean()
         return result
     }
 
     getUserByEmailRegister = async (email) => {
-        const result = await userModel.findOne({email_register: email}).lean()
+        const result = await userModel.findOne({ email_register: email }).lean()
         return result
     }
 
     create = async (user) => {
-        const result = await userModel.create({user})
+        const result = await userModel.create(user)
         return result
     }
 

@@ -29,9 +29,8 @@ export default class UsersService {
     }
 
     async register(user) {
-        const user = await this.usersDAO.getUserByEmailRegister(user.email_register)
-
-        if(user){
+        const userRegister = await this.usersDAO.getUserByEmailRegister(user.email_register)
+        if(userRegister){
             throw new UserAlreadyExists(`User email ${user.email_register} already exist, please try with another email.`)
         }
 
@@ -39,7 +38,7 @@ export default class UsersService {
             first_name: user.first_name,
             last_name: user.last_name,
             email_register: user.email_register,
-            avatar_url: user.avatar_url
+            avatar_url: user.avatar_url || ''
         }
 
         const passwordHashed = hashPass(user.password)
@@ -52,19 +51,19 @@ export default class UsersService {
     }
 
     async login(user) {
-        const userDate = await this.usersDAO.getUserByEmailRegister(user.email_register)
+        const userData = await this.usersDAO.getUserByEmailRegister(user.email_register)
 
-        if(!userDate){
+        if(!userData){
             throw new UserNotFound(`User ${user.email_register} not found`)
         }
 
-        const validatePass = verify(user.password, userDate.password)
+        const validatePass = verify(user.password, userData.password)
 
         if(!validatePass){
             throw new IncorrectLoginCredentials(`Incorrect Credentials`)
         }
 
-        const accessToken = generateToken(userDate)
+        const accessToken = generateToken(userData)
 
         return accessToken
 

@@ -1,10 +1,6 @@
-import conversationModel from './models/conversations.model.js'
+import conversationModel from '../models/conversations.model.js'
 
 export default class ConversationsDAO {
-    constructor(){
-        console.log(`Working DB with MongoDb`)
-    }
-    //paginar conversaciones primeras 15
     getAllConvers = async () => { 
         const result = await conversationModel.find().lean()
         return result

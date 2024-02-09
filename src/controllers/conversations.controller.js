@@ -1,8 +1,8 @@
 import ConversationsService from '../services/conversations.service.js'
 import { ElementNotFound, UserNotFound } from '../errors/error-exceptions.js'
-import ConversationsDAO from '../dao/conversations.dao.js'
-import MessagesDAO from '../dao/messages.dao.js'
-import UsersDAO from '../dao/users.dao.js'
+import ConversationsDAO from '../dao/dbManagers/conversations.dao.js'
+import MessagesDAO from '../dao/dbManagers/messages.dao.js'
+import UsersDAO from '../dao/dbManagers/users.dao.js'
 
 const conversationsService = new ConversationsService(new ConversationsDAO(), new MessagesDAO(), new UsersDAO())
 

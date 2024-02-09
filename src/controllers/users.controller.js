@@ -1,7 +1,9 @@
 import { UserNotFound, UserAlreadyExists, IncorrectLoginCredentials, ElementNotFound} from '../errors/error-exceptions.js'
 import UsersService from '../services/users.service.js'
-import UsersDAO from '../dao/users.dao.js'
-import ConversationsDAO from '../dao/conversations.dao.js'
+import UsersDAO from '../dao/dbManagers/users.dao.js'
+import ConversationsDAO from '../dao/dbManagers/conversations.dao.js'
+import config from '../config/config.js'
+
 
 const usersService = new UsersService(new UsersDAO(), new ConversationsDAO())
 
@@ -42,10 +44,10 @@ export default class UsersControllers{
 
     async register (req, res) {
         try {
-            const { first_name, last_name, email_register, password, avatar_url } = req.body
+            const { first_name, last_name, email_register, password } = req.body
 
-            if( !first_name || !last_name || !email_register || !password || !avatar_url ) {
-                return res.status(400).send({message: `Missing fields`})
+            if( !first_name || !last_name || !email_register || !password  ) {
+                return res.status(400).send({message: `Incomplete values`})
             }
             
             const register = await usersService.register({ ...req.body })
@@ -54,6 +56,9 @@ export default class UsersControllers{
         
 
         } catch (error) {
+            if(error instanceof UserAlreadyExists){
+                return res.status(404).send({message: error.message})
+            }
             res.status(500).send({message: error.message})
         }
     }
@@ -63,7 +68,7 @@ export default class UsersControllers{
             const { email_register, password } = req.body
 
             if ( !email_register || !password ){
-                return res.status(400).send({message: `Missing fields`})
+                return res.status(400).send({message: `Incomplete values`})
             }
 
             const accessToken = await usersService.login({...req.body})
@@ -76,7 +81,7 @@ export default class UsersControllers{
             if(error instanceof UserNotFound){
                 return res.status(404).send({message: error.message})
             }
-            if(error instanceof UserAlreadyExists){
+            if(error instanceof IncorrectLoginCredentials){
                 return res.status(404).send({message: error.message})
             }
             res.status(500).send({message: error.message})
@@ -88,7 +93,7 @@ export default class UsersControllers{
             const { userId, converId } = req.body
 
             if( !userId || !converId){
-                return res.status(400).send({message: `Missing fields`})
+                return res.status(400).send({message: `Incomplete values`})
             }
 
             await usersService.addConver({...req.body})
@@ -111,7 +116,7 @@ export default class UsersControllers{
             const { userId, nickName } = req.body
 
             if( !userId || !nickName ){
-                return res.status(400).send({message: `Missing fields`})
+                return res.status(400).send({message: `Incomplete values`})
             }
 
             const user = await usersService.changeNickName({...req.body})
@@ -131,7 +136,7 @@ export default class UsersControllers{
             const { userId, firstName } = req.body
 
             if( !userId || !firstName ){
-                return res.status(400).send({message: `Missing fields`})
+                return res.status(400).send({message: `Incomplete values`})
             }
 
             const user = await usersService.changeFirstName({...req.body})
@@ -146,7 +151,7 @@ export default class UsersControllers{
         }
     }
 
-    async changelastName (req, res) {
+    async changeLastName (req, res) {
         try {
             const { userId, lastName } = req.body
 
