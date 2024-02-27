@@ -1,13 +1,8 @@
-import { UserNotFound, UserAlreadyExists, IncorrectLoginCredentials, ElementNotFound} from '../errors/error-exceptions.js'
-import UsersService from '../services/users.service.js'
-import UsersDAO from '../dao/dbManagers/users.dao.js'
-import ConversationsDAO from '../dao/dbManagers/conversations.dao.js'
+import { UserNotFound, UserAlreadyExists, IncorrectLoginCredentials, ElementNotFound, ElementAlreadyExist} from '../errors/error-exceptions.js'
 import config from '../config/config.js'
+import { usersService } from '../services/index.js'
 
-
-const usersService = new UsersService(new UsersDAO(), new ConversationsDAO())
-
-export default class UsersControllers{
+export default class UsersController{
     async getUsers (req, res) {
         try {
             const users = await usersService.getUsers()
@@ -70,9 +65,9 @@ export default class UsersControllers{
             if ( !email_register || !password ){
                 return res.status(400).send({message: `Incomplete values`})
             }
-
+            
             const accessToken = await usersService.login({...req.body})
-
+            
             res.cookie(
                 config.cookieToken, accessToken, { maxAge: 60 * 60 * 1000, httpOnly: true }
             ).send({message: 'Authorized'})
@@ -82,7 +77,7 @@ export default class UsersControllers{
                 return res.status(404).send({message: error.message})
             }
             if(error instanceof IncorrectLoginCredentials){
-                return res.status(404).send({message: error.message})
+                return res.status(401).send({message: error.message})
             }
             res.status(500).send({message: error.message})
         }
@@ -99,6 +94,30 @@ export default class UsersControllers{
             await usersService.addConver({...req.body})
 
             res.send({status: 'success'})
+            
+        } catch (error) {
+            if(error instanceof UserNotFound){
+                return res.status(404).send({message: error.message})
+            }
+            if(error instanceof ElementNotFound){
+                return res.status(404).send({message: error.message})
+            }
+            res.status(500).send({message: error.message})
+        }
+    }
+
+
+    async getConvers (req, res) {
+        try {
+            const { userId } = req.body
+
+            if( !userId ){
+                return res.status(400).send({message: `Incomplete values`})
+            }
+
+            const convers = await usersService.getConvers(userId)
+
+            res.send({status: 'success', convers})
             
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -170,6 +189,93 @@ export default class UsersControllers{
             res.status(500).send({message: error.message})
         }
     }
+
+    async changeEmailRegister (req, res) {
+        try {
+            const { userId, emailRegister } = req.body
+
+            if( !userId || !emailRegister){
+                return res.status(404).send({message: error.message})
+            }
+
+            await usersService.changeEmailRegister(userId, emailRegister)
+
+            res.send({status: 'succes', message: 'Email changed succesfully'})
+        } catch (error) {
+            if(error instanceof UserNotFound){
+                return res.status(404).send({message: error.message})
+            }
+            res.status(500).send({message: error.message})
+        }
+    }
+
+    async changeEmailSecondary (req, res) {
+        try {
+            const { userId, emailSecondary } = req.body
+
+            if( !userId || !emailSecondary){
+                return res.status(404).send({message: error.message})
+            }
+
+            await usersService.changeEmailSecondary(userId, emailSecondary)
+
+            res.send({status: 'succes', message: 'Email changed succesfully'})
+        } catch (error) {
+            if(error instanceof UserNotFound){
+                return res.status(404).send({message: error.message})
+            }
+            if(error instanceof ElementAlreadyExist){
+                return res.status(404).send({message: error.message})
+            }
+            res.status(500).send({message: error.message})
+        }
+    }
+
+    async changeVisibility (req, res) {
+        try {
+            const { userId, visibility } = req.body
+
+            if( !userId || !visibility){
+                return res.status(404).send({message: error.message})
+            }
+
+            await usersService.changeVisibility(userId, visibility)
+
+            res.send({status: 'succes', message: 'Visibility changed succesfully'})
+        } catch (error) {
+            if(error instanceof UserNotFound){
+                return res.status(404).send({message: error.message})
+            }
+            if(error instanceof ElementAlreadyExist){
+                return res.status(404).send({message: error.message})
+            }
+            res.status(500).send({message: error.message})
+        }
+    }
+    
+    async changeAvatar (req, res) {
+        try {
+            const { userId, avatar } = req.body
+
+            if( !userId ||!avatar){
+                return res.status(404).send({mesage: 'Missing fields'})
+            }
+
+            await usersService.changeAvatar(userId, avatar)
+
+            res.send({status: 'succes', message: 'The avatar has changed'})
+            
+        } catch (error) {
+            if(error instanceof UserNotFound){
+                return res.status(404).send({message: error.message})
+            }
+            if(error instanceof ElementAlreadyExist){
+                return res.status(404).send({message: error.message})
+            }
+            res.status(500).send({message: error.message})
+        }
+    }
+
 
     async deleteUser (req, res) {
         try {

@@ -17,6 +17,7 @@ const startPassport = () => {
         },
         async (jwt_payload, done) => {
             try {
+                //aquí traer el user para disponer de sus datos.
                 return done(null, jwt_payload.user)
             } catch (error) {
                 return done(error)

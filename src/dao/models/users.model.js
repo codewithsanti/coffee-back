@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
         default: '/img/avatar_image'
     },
     created_at:{
-        type: String,
+        type: Date,
         date: new Date().toLocaleString()
     },
     role: {
@@ -40,16 +40,25 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
-    status: {
+    state: {
         type: String,
         enum: ['active', 'disactive'],
         default: 'active'
     },
+    visibility: {
+        type: String,
+        enum: ['private', 'public', 'restricted', 'disabled']
+    },
     conversations: [
         {
-            type: mongoose.Schema.Types.ObjectId
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'conversations'
         }
-    ]
+    ],
+    contact_list: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref:'contacts'
+    }
 })
 
 

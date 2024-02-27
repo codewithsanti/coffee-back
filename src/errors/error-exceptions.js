@@ -25,3 +25,11 @@ export class ElementNotFound extends Error {
         this.name = this.constructor.name
     }
 }
+
+export class ElementAlreadyExist extends Error {
+    constructor(message) {
+        super(message)
+        this.name = this.constructor.name
+    }
+}
+

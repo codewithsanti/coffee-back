@@ -1,13 +1,18 @@
 import { userModel } from '../models/users.model.js'
 
 export default class usersDAO {
-    getUsers = async () => {
+    getAll = async () => {
         const result = await userModel.find().lean()
         return result
     }
 
-    getUserById = async (userId) => {
-        const result = await userModel.findOne({_id: userId}).lean()
+    getById = async (userId) => {
+        const result = await userModel.findOne({_id: userId})
+        return result
+    }
+
+    getByState = async (socialState) => {
+        const result = await userModel.find({socialState: socialState}).lean()
         return result
     }
 
@@ -18,6 +23,11 @@ export default class usersDAO {
 
     create = async (user) => {
         const result = await userModel.create(user)
+        return result
+    }
+
+    getConvers = async (userId) => {
+        const result = await userModel.findOne({_id: userId}, 'conversations').populate('conversations')
         return result
     }
 
@@ -51,8 +61,13 @@ export default class usersDAO {
         return result 
     }
 
-    changeStatus = async (userId, status) => {
-        const result = await userModel.findOneAndUpdate({_id: userId}, {status: status})
+    changeSocialStatus = async (userId, socialStatus) => {
+        const result = await userModel.findOneAndUpdate({_id: userId}, {social_status: socialStatus})
+        return result
+    }
+
+    changeVisibility = async (userId, visibility) => {
+        const result = await userModel.findOneAndUpdate({_id: userId}, {visibility: visibility})
         return result 
     }
 
@@ -61,7 +76,7 @@ export default class usersDAO {
         return result 
     }
 
-    deleteUser = async (userId) => {
+    delete = async (userId) => {
         const result = await userModel.findOneAndDelete({_id: userId})
         return result
     }

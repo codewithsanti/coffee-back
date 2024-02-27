@@ -6,10 +6,7 @@ const messageCollection = 'messages'
 const messageSchema = new mongoose.Schema({
     sender: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
-        require: true,
-        unique: true,
-        index: true
+        ref: 'users'
     },
     receivers: [ 
         {
@@ -19,15 +16,13 @@ const messageSchema = new mongoose.Schema({
     ],
     conversation: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'conversations',
-            unique: true,
-            index: true
+            ref: 'conversations'
     },
     content: {
-        type:String,
-        created_at: new Date().toLocaleString()
+        type: String,
+        date: { created_at: new Date().toLocaleString()}
     },
-    status: {
+    state: {
         type: String,
         enum: ['active', 'deleted']
     }

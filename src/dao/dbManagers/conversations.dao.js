@@ -11,12 +11,12 @@ export default class ConversationsDAO {
         return result
     }
 
-    getConverById = async (converId) => {
+    getById = async (converId) => {
         const result = await conversationModel.findOne ({_id: converId}).lean()
         return result
     }
 
-    createConver = async (conver) => {
+    create = async (conver) => {
         const result = await conversationModel.create(conver)
         return result
     }

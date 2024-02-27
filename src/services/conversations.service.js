@@ -1,15 +1,9 @@
 import { ElementNotFound, UserNotFound } from '../errors/error-exceptions.js'
-
-
+import { conversationsRepository, usersRepository } from '../reporitories/index.js'
 export default class conversationsService {
-    constructor(conversationsDAO, messagesDAO, usersDAO){
-        this.conversationsDAO = conversationsDAO
-        this.messagesDAO = messagesDAO
-        this.usersDAO = usersDAO
-    }
-
+    
     async getAllConvers() {
-        const conversations = this.conversationsDAO.getAllConvers()
+        const conversations = conversationsRepository.getAllConvers()
 
         if(!conversations){
             throw new ElementNotFound(`Conversations not found`)
@@ -18,8 +12,8 @@ export default class conversationsService {
         return conversations
     }
 
-    async getConver(converId) {
-        const converMessages = this.conversationsDAO.getConverMsgsById(converId)
+    async getConverMsgs(converId) {
+        const converMessages = conversationsRepository.getConverMsgs(converId)
         
         if(!converMessages){
             throw new ElementNotFound(`Conversation not found`)
@@ -29,99 +23,83 @@ export default class conversationsService {
     }
 
     async createConver(conver) {
-        const converCreator = await this.usersDAO.getUserById(conver.created_by)
-
-        const converInvited = await this.usersDAO.getUserById(conver.receiverId)
+        
+        const converCreator = await usersRepository.getUserById(conver.sender)
+        
+        const converReceiver = await usersRepository.getUserById(conver.receivers)
 
         if(!converCreator){
-            throw new UserNotFound(`User ${conver.created_by} not found`)
+            throw new UserNotFound(`User ${conver.sender} not found`)
         }
 
-        if(!converInvited){
-            throw new UserNotFound(`User ${conver.receiverId} not found`)
+        if(!converReceiver){
+            throw new UserNotFound(`User ${conver.receivers} not found`)
         }
 
-        /* === conver.initialMsg===
-           >> el mensaje con el que el frontend confirma e inicia la conversación. */
+        // const newConver = {
+        //     conversation_name: 'Mi primera conversación♥',
+        //     users: [ converCreator._id, converReceiver._id ],
+        //     messages: [],
+        //     created_by: converCreator._id
+        // }
 
-        const newConver = {
-            conversation_name: 'Mi primera conversación♥',
-            users: [ converCreator._id, converInvited._id ],
-            messages: [],
-            created_by: converCreator._id
-        }
-
-        const result = await this.conversationsDAO.createConver(newConver)
+        const result = await conversationsRepository.createConver(conver)
 
         return result
     }
 
     async addUserToConver (userId, converId) {
-        const userToAdd = await this.usersDAO.getUserById(userId)
+        const userToAdd = await usersRepository.getUserById(userId)
 
         if (!userToAdd) {
             throw new UserNotFound(`User ${user.first_name} not found`)
         }
         
-        const converExists = await this.conversationsDAO.getConverById(converId)
+        const converExists = await conversationsRepository.getConverById(converId)
 
         if(!converExists) {
             throw new ElementNotFound (`Conversation with ID N°${converId} not exist`)
         }
 
-        const result = await this.conversationsDAO.addUserToConver(converId, userToAdd._id)
+        const result = await conversationsRepository.addUserToConver(converId, userToAdd._id)
 
         return result
 
     }
-
-    //Este método es utilizado por el message service.
-    async addMsgToConver(messageId) {
-        const converExists = await this.conversationsDAO.getConverById(converId)
-
-        if(!converExists) {
-            throw new ElementNotFound (`Conversation with ID N°${converId} not exist`)
-        }
-        
-        const result = await this.conversationsDAO.addMsgToConver(messageId)
-
-        return result
-    }
-
 
     async changeName(converId, name) {
-        const converExists = await this.conversationsDAO.getConverById(converId)
+        const converExists = await conversationsRepository.getConverById(converId)
 
         if(!converExists) {
             throw new ElementNotFound (`Conversation with ID N°${converId} not exist`)
         }
 
 
-        const result = await this.conversationsDAO.changeName(name)
+        const result = await conversationsRepository.changeName(converId,name)
         
         return result
     }
 
-    async changeStatus(converId, status) {
-        const converExists = await this.conversationsDAO.getConverById(converId)
+    async changeState(converId, state) {
+        const converExists = await conversationsRepository.getConverById(converId)
 
         if(!converExists) {
             throw new ElementNotFound (`Conversation with ID N°${converId} not exist`)
         }
 
-        const result = await this.conversationsDAO.changeStatus(converId, status)
+        const result = await conversationsRepository.changeState(converId, state)
         
         return result
     }
 
     async deleteConver(converId) {
-        const converExists = await this.conversationsDAO.getConverById(converId)
+        const converExists = await conversationsRepository.getConverById(converId)
 
         if(!converExists) {
             throw new ElementNotFound (`Conversation with ID N°${converId} not exist`)
         }
         
-        const result = await this.conversationsDAO.deleteConver(converId)
+        const result = await conversationsRepository.deleteConver(converId)
         return result
 
     }

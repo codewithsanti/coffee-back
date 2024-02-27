@@ -6,26 +6,23 @@ const conversationCollection = 'conversations'
 const conversationSchema = new mongoose.Schema ({
     conversation_name: {
         type: String,
-        default: '',
-        require: true
+        default: ''
     },
     users: [ 
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'users',
-            require: true
+            ref: 'users'
         }
     ],
-    messages: [ 
+    messages: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'messages',
-            require: true
+            ref: 'messages'
         }
     ],
     created_at: {
-        type: String,
-        default: new Date().toLocaleString()
+        type: Date,
+        default: Date.now
     },
     created_by: {
         type: mongoose.Schema.Types.ObjectId,
@@ -39,9 +36,11 @@ const conversationSchema = new mongoose.Schema ({
 
 })
 
-conversationSchema.pre('find', function(){
-    this.populate('users')
+conversationSchema.pre('find', function(next){
+    this.populate('users messages')
+    next()
 })
+
 conversationSchema.pre('findOne', function(){
     this.populate('users')
 })

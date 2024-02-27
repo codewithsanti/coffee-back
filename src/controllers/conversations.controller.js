@@ -1,12 +1,10 @@
-import ConversationsService from '../services/conversations.service.js'
 import { ElementNotFound, UserNotFound } from '../errors/error-exceptions.js'
-import ConversationsDAO from '../dao/dbManagers/conversations.dao.js'
-import MessagesDAO from '../dao/dbManagers/messages.dao.js'
-import UsersDAO from '../dao/dbManagers/users.dao.js'
+import ConversationsService from '../services/conversations.service.js'
 
-const conversationsService = new ConversationsService(new ConversationsDAO(), new MessagesDAO(), new UsersDAO())
+const conversationsService = new ConversationsService()
 
 export default class ConversationsController {
+    
     async getAllConvers(req, res) {
         try {
             const convers = await conversationsService.getAllConvers()
@@ -40,6 +38,27 @@ export default class ConversationsController {
         }
     }
 
+    async getConverMsgs (req, res) {
+        try {
+            const { converId } = req.body
+
+            if(!converId) {
+                return res.status(404).send({message: `Incomplete values`})
+            }
+
+            const conver = await conversationsService.getConverMsgs(converId)
+
+            res.send({status: 'success', conver: conver})
+
+        } catch (error) {
+            if(error instanceof ElementNotFound){
+                return res.status(404).send({message:error.message})
+            }
+        }
+    }
+
+
+    //This function is near to be deprecated
     async createConver(req, res) {
         try {
             const { users, messages, created_by } = req.body
@@ -102,17 +121,17 @@ export default class ConversationsController {
             res.status(500).send({message: error.message})
         }
     }
-    async changeStatus(req, res) {
+    async changeState(req, res) {
         try {
-            const { userId, status } = req.body
+            const { userId, state } = req.body
             
-            if( !userId || !status ){
+            if( !userId || !state ){
                 res.status(400).send({message: 'Missing fields'})
             }
 
-            await conversationsService.changeName(userId, status)
+            await conversationsService.changeState(userId, state)
 
-            res.send({status: 'succes', message: 'Status changed'})
+            res.send({status: 'succes', message: 'State changed'})
 
         } catch (error) {
             if(error instanceof ElementNotFound){

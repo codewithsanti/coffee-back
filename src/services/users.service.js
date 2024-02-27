@@ -1,15 +1,11 @@
-import { UserNotFound, UserAlreadyExists, IncorrectLoginCredentials, ElementNotFound} from '../errors/error-exceptions.js'
+import { UserNotFound, UserAlreadyExists, IncorrectLoginCredentials, ElementNotFound, ElementAlreadyExist} from '../errors/error-exceptions.js'
 import { generateToken, hashPass, verify } from '../utils/utils.js'
-
+import { usersRepository, conversationsRepository, contactsRepository } from '../reporitories/index.js'
 
 export default class UsersService {
-    constructor(usersDAO, conversationsDAO){
-        this.usersDAO = usersDAO
-        this.conversationsDAO = conversationsDAO
-    }
 
     async getUsers() {
-        const users = await this.usersDAO.getUsers()
+        const users = await usersRepository.getAll()
         
         if(!users){
             throw new UserNotFound(`Users not found`)
@@ -18,8 +14,8 @@ export default class UsersService {
         return users
     }
 
-    async getUserById(userId) {
-        const user = await this.usersDAO.getUserById(userId)
+    async getById(userId) {
+        const user = await usersRepository.getById(userId)
 
         if(!user){
             throw new UserNotFound(`User with ID N°${user._id} not found`)
@@ -29,7 +25,7 @@ export default class UsersService {
     }
 
     async register(user) {
-        const userRegister = await this.usersDAO.getUserByEmailRegister(user.email_register)
+        const userRegister = await usersRepository.getUserByEmailRegister(user.email_register)
         if(userRegister){
             throw new UserAlreadyExists(`User email ${user.email_register} already exist, please try with another email.`)
         }
@@ -45,13 +41,15 @@ export default class UsersService {
 
         newUser.password = passwordHashed
 
-        const result = await this.usersDAO.create(newUser)
+        const result = await usersRepository.create(newUser)
+        
+        await addContactList(result._id)
         
         return result
     }
 
     async login(user) {
-        const userData = await this.usersDAO.getUserByEmailRegister(user.email_register)
+        const userData = await usersRepository.getUserByEmailRegister(user.email_register)
 
         if(!userData){
             throw new UserNotFound(`User ${user.email_register} not found`)
@@ -66,71 +64,180 @@ export default class UsersService {
         const accessToken = generateToken(userData)
 
         return accessToken
+    }
 
+    async createContact(userId, contactId) {
+        const user = await usersRepository.getById(userId)
+        
+        if(!user){
+            throw new UserNotFound(`User with ID N°${user._id} not found`)
+        }
+
+        const userContact= await usersRepository.getById(contactId)
+
+        if(!userContact){
+            throw new UserNotFound(`User Contact with ID N°${user._id} not found`)
+        }
+
+        const result = await usersRepository.addContact(userId, contactId)
+
+
+        return result
     }
     
     async addConver(userId, converId) {
-        const user = await this.usersDAO.getUserById(userId)
+        const user = await usersRepository.getById(userId)
 
         if(!user){
             throw new UserNotFound(`User with ID N°${userId} not found`)
         }
 
-        const conver = await this.conversationsDAO.getConverById(converId)
+        const conver = await conversationsRepository.getConverById(converId)
 
         if(!conver){
             throw new ElementNotFound(`Conversation with ID N°${converId} not found`)
         }
 
-        const result = await this.usersDAO.addConver(userId, converId)
+        const result = await usersRepository.addConver(userId, converId)
 
         return result
     }
 
-    async changeNickName(userId, nickName) {
-         const user = await this.usersDAO.getUserById(userId)
+    async addContactList (userId) {
+        const user = await usersRepository.getById(userId)
+
+        if(!user){
+            throw new UserNotFound(`User with ID N°${user._id} not found`)
+        }
+
+        const list = await contactsRepository.createList(userId)
+
+        user.contact_list.push(list._id)
+
+        const result = await user.save()
+       
+        return result
+    }
+
+    async getConvers(userId) {
+        const user = await usersRepository.getById(userId)
 
         if(!user){
             throw new UserNotFound(`User with ID N°${userId} not found`)
         }
 
-        const result = await this.usersDAO.changeNickName(userId, nickName)
+        const convers = await usersRepository.getConvers(userId)
+
+        if(!convers){
+            throw new ElementNotFound(`There's no conversations`)
+        }
+
+        return convers
+
+    }
+
+    async changeNickName(userId, nickName) {
+         const user = await usersRepository.getById(userId)
+
+        if(!user){
+            throw new UserNotFound(`User with ID N°${userId} not found`)
+        }
+
+        const result = await usersRepository.changeNickName(userId, nickName)
 
         return result
     }
 
     async changeFirstName(userId, firstName) {
-        const user = await this.usersDAO.getUserById(userId)
+        const user = await usersRepository.getById(userId)
 
         if(!user){
             throw new UserNotFound(`User with ID N°${userId} not found`)
         }
 
-        const result = await this.usersDAO.changeFirstName(userId, firstName)
+        const result = await usersRepository.changeFirstName(userId, firstName)
         
         return result
     }
 
     async changeLastName(userId, lastName) {
-        const user = await this.usersDAO.getUserById(userId)
+        const user = await usersRepository.getById(userId)
 
         if(!user){
             throw new UserNotFound(`User with ID N°${userId} not found`)
         }
 
-        const result = await this.usersDAO.changeLastName(userId, lastName)
+        const result = await usersRepository.changeLastName(userId, lastName)
+
+        return result
+    }
+    
+    async changeEmailRegister(userId, emailRegister){
+        const user = await usersRepository.getById(userId)
+        if(!user){
+            throw new UserNotFound(`User with ID N° ${userId} not found`)
+        }
+
+        if(newEmail === user.email_register){
+            throw new ElementAlreadyExist(`New email cannot be the same. Please try with another email`)
+        }
+
+        const result = await usersRepository.changeEmailRegister(userId, emailRegister)
+
+        return result
+    }
+
+    async changeEmailSecondary(userId, emailSecondary){
+        const user = await usersRepository.getById(userId)
+        if(!user){
+            throw new UserNotFound(`User with ID N° ${userId} not found`)
+        }
+
+        if(user.email_secondary === newEmail){
+            throw new ElementAlreadyExist(`New email cannot be the same. Please try with another email`)
+        }
+
+        const result = await usersRepository.changeEmailSecondary(userId, emailSecondary)
+
+        return result
+    }
+
+    async changeVisibility(userId, visibility){
+        const user = await usersRepository.getById(userId)
+        
+        if(!user){
+            throw new UserNotFound(`User with ID N° ${userId} not found`)
+        }
+
+        if(user.visibility === visibility) {
+            throw new ElementAlreadyExist(`The cannot be changed`)
+        }
+
+        const result = await usersRepository.changeVisibility(userId, visibility)
+
+        return result
+    }
+
+    async changeAvatar(userId, newAvatar) {
+        const user = await usersRepository.getById(userId)
+
+        if(!user){
+            throw new UserNotFound(`User with ID N°${userId} not found`)
+        }
+
+        const result =  await usersRepository.changeAvatar(userId, newAvatar)
 
         return result
     }
 
     async deleteUser(userId) {
-        const user = await this.usersDAO.getUserById(userId)
+        const user = await usersRepository.getById(userId)
 
         if(!user){
             throw new UserNotFound(`User with ID N°${userId} not found`)
         }
 
-        const result = await this.usersDAO.deleteUser(userId)
+        const result = await usersRepository.deleteUser(userId)
         
         return result
     }

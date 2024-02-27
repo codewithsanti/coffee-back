@@ -4,11 +4,13 @@ import MessagesController from '../controllers/messages.controller.js'
 
 const messagesController = new MessagesController()
 
+
+
 export default class MessagesRouter extends Router {
     init(){
         this.post('/message', ['USER', 'ADMIN'], customStrategy.JWT, messagesController.create)
 
-        this.patch('/message/status', ['USER', 'ADMIN'], customStrategy.JWT, messagesController.changeStatus)
+        this.patch('/message/state', ['USER', 'ADMIN'], customStrategy.JWT, messagesController.changeState)
     }
 }
 
