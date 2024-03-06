@@ -6,7 +6,7 @@ export default class ConversationsDAO {
         return result
     }
 
-    getConverMsgsById = async (converId) => {
+    getConverMessages = async (converId) => {
         const result = await conversationModel.findOne({_id: converId}, 'messages').lean()
         return result
     }
@@ -22,12 +22,12 @@ export default class ConversationsDAO {
     }
 
     addUserToConver = async (converId, userId) => {
-        const result = await conversationModel.findOne({_id: converId}).users.push(userId)
+        const result = await conversationModel.findOneAndUpdate({_id: converId}, {$push: {users:userId}})
         return result
     }
 
     addMsgToConver = async (converId, messageId) => {
-        const result = await conversationModel.findOne({_id: converId}).messages.push(messageId)
+        const result = await conversationModel.findOneAndUpdate({_id: converId}, {$push: {messages: messageId}})
         return result
     }
 
@@ -35,8 +35,8 @@ export default class ConversationsDAO {
         const result = await conversationModel.findOneAndUpdate({_id: converId}, {conversation_name: name})
         return result 
     }
-    changeStatus = async (converId, status) => {
-        const result = await conversationModel.findOneAndUpdate({_id: converId},{ status: status })
+    changeState = async (converId, state) => {
+        const result = await conversationModel.findOneAndUpdate({_id: converId}, {state: state})
         return result
     }
     deleteConver = async (converId) => {

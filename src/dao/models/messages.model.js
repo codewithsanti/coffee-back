@@ -6,7 +6,8 @@ const messageCollection = 'messages'
 const messageSchema = new mongoose.Schema({
     sender: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users'
+        ref: 'users',
+        unique: false
     },
     receivers: [ 
         {
@@ -20,7 +21,10 @@ const messageSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        date: { created_at: new Date().toLocaleString()}
+        date: { created_at: {
+            type: Date,
+            default: Date.now
+        }}
     },
     state: {
         type: String,
@@ -29,6 +33,7 @@ const messageSchema = new mongoose.Schema({
 
 })
 
+//messageSchema.index({ sender: 1 }, { unique: false })
 
 messageSchema.pre('find', function(){
     this.populate('sender')

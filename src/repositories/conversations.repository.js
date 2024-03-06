@@ -6,8 +6,13 @@ export default class ConversationsRepository extends GenericRepository {
         this.dao = dao
     }
 
-    async getConverMsgs (converId) {
-        const result = await this.dao.getConverMsgsById(converId)
+    async getConvers (converId) {
+        const result = await this.dao.getConvers(converId)
+        return result
+    }
+
+    async getConverMessages (converId) {
+        const result = await this.dao.getConverMessages(converId)
         return result
     }
 
@@ -26,8 +31,8 @@ export default class ConversationsRepository extends GenericRepository {
         return result
     }
 
-    async changeState(converId, status) {
-        const result = await this.dao.changeStatus(converId, status)
+    async changeState(converId, state) {
+        const result = await this.dao.changeState(converId, state)
         return result
     }
 

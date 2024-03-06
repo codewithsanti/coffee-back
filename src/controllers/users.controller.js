@@ -17,7 +17,7 @@ export default class UsersController{
         }
     }
 
-    async getUserById (req, res) {
+    async getById (req, res) {
         try {
             const { userId } = req.body
             
@@ -25,7 +25,7 @@ export default class UsersController{
                 return res.status(400).send({message: `Missing fields`})
             }
 
-            const user = await usersService.getUserById(userId)
+            const user = await usersService.getById(userId)
 
             res.send({status: 'success', user})
 

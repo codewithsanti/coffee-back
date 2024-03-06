@@ -1,19 +1,19 @@
 import { UserNotFound } from '../errors/error-exceptions.js'
-import ContactsService from '../services/contacts.service.js'
+import ContactsListService from '../services/contactsList.service.js'
 
-const contactsService = new ContactsService()
+const contactsListService = new ContactsListService()
 
 export default class ContactsController {
     
     async getContacts (req, res) {
         try {
-            const { ownerId } = req.body
+            const { userId } = req.body
 
-            if(!ownerId) return res.status(404).send({message: 'Owner Id is required'})
+            if(!userId) return res.status(404).send({message: 'Owner Id is required'})
 
-            const contacts = await contactsService.getContacts(ownerId)
+            const contacts = await contactsListService.getContacts(userId)
 
-            res.send({status:'succes', contacts})
+            res.send({status:'success', contacts})
 
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -25,13 +25,13 @@ export default class ContactsController {
     
     async getRequests (req, res) {
         try {
-            const { ownerId } = req.body
+            const { userId } = req.body
 
-            if(!ownerId) return res.status(404).send({message: 'Owner Id is required'})
+            if(!userId) return res.status(404).send({message: 'User Id is required'})
 
-            const requests = await contactsService.getRequests(ownerId)
+            const requests = await contactsListService.getRequests(userId)
 
-            res.send({status:'succes', requests})
+            res.send({status:'success', requests})
         } catch (error) {
             if(error instanceof UserNotFound){
                 return res.status(404).send({message: error.message})
@@ -42,13 +42,13 @@ export default class ContactsController {
 
     async addContact (req, res) {
         try {
-            const { ownerId, contactId } = req.body
+            const { userId, contactId } = req.body
 
-            if( !ownerId || !contactId){
+            if( !userId || !contactId){
                 return res.status(404).send({message: 'Missing fields'})
             }
 
-            const contact = await contactsService.addContact(ownerId, contactId)
+            const contact = await contactsListService.addContact(userId, contactId)
 
             res.send({status: 'succes', message:'User added to contacts', contact})
 
@@ -58,6 +58,68 @@ export default class ContactsController {
             }
             res.status(500).send({message: error.message})
         }
-    }    
+    }
 
+    async sendRequest (req, res) {
+        try {
+            const { userId, contactId } = req.body
+
+            if( !userId || !contactId){
+                return res.status(404).send({message: 'Missing fields'})
+            }
+
+            const request = await contactsListService.sendRequest(userId, contactId)
+
+            res.send({status: 'succes', message:'Request sent', request})
+
+        } catch (error) {
+            if(error instanceof UserNotFound){
+                return res.status(404).send({message: error.message})
+            }
+            res.status(500).send({message: error.message})
+        }
+    }
+    
+    async acceptContact (req, res) {
+        try {
+            const { userId, contactId } = req.body
+        
+            if(!userId || ! contactId){
+                return res.status(404).send({message: 'Misising fields'})
+            }
+
+            await contactsListService.acceptContact(userId, contactId)
+            
+            res.send({ status: 'success' })
+
+        } catch (error) {
+            if(error instanceof UserNotFound){
+                return res.status(404).send({message: error.message})
+            }
+            res.status(500).send({message: error.message})
+        }
+
+
+    }
+
+    async deleteContact(req, res) {
+        try {
+            const { userId, contactId } = req.body
+
+            if( !userId || !contactId){
+                return res.status(404).send({message: 'Missing fields'})
+            }
+
+            const contact = await contactsListService.deleteContact(userId, contactId)
+
+            res.send({status: 'succes', message:'User delted from contacts', contact})
+
+
+        } catch (error) {
+            if(error instanceof UserNotFound){
+                return res.status(404).send({message: error.message})
+            }
+            res.status(500).send({message: error.message})
+        }
+    }
 }

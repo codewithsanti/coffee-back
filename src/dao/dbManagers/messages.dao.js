@@ -2,9 +2,9 @@ import messageModel from '../models/messages.model.js'
 
 
 export default class messagesDAO {      
-    createMessage = async (message) => {
-        //console.log(message) OK
-        const result = await messageModel.create({message})
+    create = async (message) => {
+        console.log(message)
+        const result = await messageModel.create(message)
         return result
     }
 

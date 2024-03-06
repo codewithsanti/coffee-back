@@ -28,7 +28,7 @@ const conversationSchema = new mongoose.Schema ({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     },
-    status: {
+    state: {
         type: String,
         enum: ['active','deleted'],
         default: 'active'

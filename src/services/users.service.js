@@ -1,6 +1,6 @@
 import { UserNotFound, UserAlreadyExists, IncorrectLoginCredentials, ElementNotFound, ElementAlreadyExist} from '../errors/error-exceptions.js'
 import { generateToken, hashPass, verify } from '../utils/utils.js'
-import { usersRepository, conversationsRepository, contactsRepository } from '../reporitories/index.js'
+import { usersRepository, conversationsRepository, contactsListRepository } from '../repositories/index.js'
 
 export default class UsersService {
 
@@ -43,7 +43,7 @@ export default class UsersService {
 
         const result = await usersRepository.create(newUser)
         
-        await addContactList(result._id)
+        await this.addContactList(result._id)
         
         return result
     }
@@ -85,34 +85,37 @@ export default class UsersService {
         return result
     }
     
-    async addConver(userId, converId) {
-        const user = await usersRepository.getById(userId)
-
-        if(!user){
-            throw new UserNotFound(`User with ID N°${userId} not found`)
-        }
-
-        const conver = await conversationsRepository.getConverById(converId)
+    async addConver(usersId, converId) {
+        const conver = await conversationsRepository.getById(converId)
 
         if(!conver){
             throw new ElementNotFound(`Conversation with ID N°${converId} not found`)
         }
 
-        const result = await usersRepository.addConver(userId, converId)
+        const result =await Promise.all(
+            usersId.map( async (userId) => {
+                const user = await usersRepository.getById(userId)
+                if(!user){
+                    throw new UserNotFound(`User with ID N°${userId} not found`)
+                }
+                user.conversations.push(conver._id)
+                await user.save()
+            })
+        )
 
         return result
     }
 
     async addContactList (userId) {
         const user = await usersRepository.getById(userId)
-
+        
         if(!user){
             throw new UserNotFound(`User with ID N°${user._id} not found`)
         }
 
-        const list = await contactsRepository.createList(userId)
-
-        user.contact_list.push(list._id)
+        const list = await contactsListRepository.createList()
+        //console.log(list) returns null
+        user.contact_list = list._id
 
         const result = await user.save()
        

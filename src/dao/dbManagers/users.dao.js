@@ -27,12 +27,12 @@ export default class usersDAO {
     }
 
     getConvers = async (userId) => {
-        const result = await userModel.findOne({_id: userId}, 'conversations').populate('conversations')
+        const result = await userModel.findOneAndUpdate({_id: userId}, 'conversations').populate('conversations')
         return result
     }
 
     addConver = async (userId, converId) => {
-        const result = await userModel.findOne({_id: userId}).conversations.push({converId})
+        const result = await userModel.findOneAndUpdate({_id: userId}, {$push: {conversations: converId}})
         return result
     }
 
@@ -61,8 +61,8 @@ export default class usersDAO {
         return result 
     }
 
-    changeSocialStatus = async (userId, socialStatus) => {
-        const result = await userModel.findOneAndUpdate({_id: userId}, {social_status: socialStatus})
+    changeSocialStatus = async (userId, visibility) => {
+        const result = await userModel.findOneAndUpdate({_id: userId}, {visibility: visibility})
         return result
     }
 

@@ -38,7 +38,7 @@ export default class ConversationsController {
         }
     }
 
-    async getConverMsgs (req, res) {
+    async getConverMessages (req, res) {
         try {
             const { converId } = req.body
 
@@ -46,7 +46,7 @@ export default class ConversationsController {
                 return res.status(404).send({message: `Incomplete values`})
             }
 
-            const conver = await conversationsService.getConverMsgs(converId)
+            const conver = await conversationsService.getConverMessages(converId)
 
             res.send({status: 'success', conver: conver})
 
@@ -57,8 +57,6 @@ export default class ConversationsController {
         }
     }
 
-
-    //This function is near to be deprecated
     async createConver(req, res) {
         try {
             const { users, messages, created_by } = req.body
