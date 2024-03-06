@@ -6,11 +6,13 @@ export default class ContactsListService {
 
 
     getContacts = async (userId) => {
-        const users = await contactsListRepository.getContacts(userId)
+        const user =  await usersRepository.getById(userId)
+        const userList = user.contact_list
 
-        if(!users){
+        if(!user){
             throw new UserNotFound(`Users not found`)
         }
+        const users = await contactsListRepository.getContacts(userList)
 
         return users
     }
@@ -18,7 +20,6 @@ export default class ContactsListService {
     getRequests = async (userId) => {
         const user =  await usersRepository.getById(userId)
         const userList = user.contact_list
-        //console.log(userList) new ObjectId('65e7cdcf392de5c8126d10a1')
 
         const requesters = await contactsListRepository.getRequests(userList)
         
@@ -61,24 +62,6 @@ export default class ContactsListService {
 
     }
 
-    // sendRequest = async (userId, contactId) => {
-    //     const owner = await usersRepository.getById(userId)
-
-    //     if(!owner){
-    //         throw new UserNotFound(`Owner with ID N° ${userId} not found`)
-    //     }
-
-    //     const contact = await usersRepository.getById(contactId)
-
-    //     if(!contact){
-    //         throw new UserNotFound(`User with ID N° ${contactId} not found`)
-    //     }
-
-    //     const result = await contactsListRepository.sendRequest(userId, contactId)
-
-    //     return result
-    // }
-
     acceptContact = async (userId, contactId) => {
         const user = await usersRepository.getById(userId)
         const userList = user.contact_list
@@ -99,19 +82,24 @@ export default class ContactsListService {
     }
 
     deleteContact = async(userId, contactId) => {
-        const owner = await usersRepository.getById(userId)
+        const user = await usersRepository.getById(userId)
+        const userList = user.contact_list
 
-        if(!owner){
+        const contactData = await usersRepository.getById(contactId)
+        const contactList = contactData.contact_list
+
+        if(!user){
             throw new UserNotFound(`Owner with ID N° ${owner} not found`)
         }
         
-        const contact = await contactsListRepository.getContact(contactId)
+        const contact = await contactsListRepository.getContact(userList, contactId)
 
         if(!contact){
             throw new UserNotFound(`Contact with ID N° ${contactId} not found`)
         }
+        await contactsListRepository.deleteContact(contactList, userId)
 
-        const result = await contactsListRepository(userId, contactId)
+        const result = await contactsListRepository.deleteContact(userList, contactId)
 
         return result
 

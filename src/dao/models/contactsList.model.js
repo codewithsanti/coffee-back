@@ -12,9 +12,10 @@ const contactListSchema = new mongoose.Schema({
             },
             state:{
                 type: String,
-                enum:['accepted', 'blocked'],
-                default: null
-            }
+                enum:['accepted', 'blocked', 'pending'],
+                default: 'pending'
+            },
+            _id: false
         }
     ],
     created_at: {
@@ -24,9 +25,11 @@ const contactListSchema = new mongoose.Schema({
     
 })
 
-contactListSchema.pre('find', function(){
-    this.populate('users')
+contactListSchema.pre('find', function(next){
+    this.populate('contacts.user', 'first_name last_name nickname avatar_url')
+    next()
 })
+
 
 contactListSchema.plugin(mongoosePaginate)
 

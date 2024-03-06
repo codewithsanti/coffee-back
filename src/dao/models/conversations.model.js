@@ -41,8 +41,9 @@ conversationSchema.pre('find', function(next){
     next()
 })
 
-conversationSchema.pre('findOne', function(){
+conversationSchema.pre('findOne', function(next){
     this.populate('users')
+    next()
 })
 
 conversationSchema.plugin(mongoosePaginate)

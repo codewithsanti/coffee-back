@@ -6,7 +6,7 @@ const contactsController = new ContactsController()
 
 export default class ContactsRoutes extends Router {
     init(){
-        this.get('/contacts', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.getContacts)
+        this.get('/', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.getContacts)
 
         this.get('/requests', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.getRequests)
 
@@ -14,6 +14,6 @@ export default class ContactsRoutes extends Router {
 
         this.post('/contact/accept', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.acceptContact)
         
-        this.delete('/contact/delete', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.deleteContact)
+        this.post('/contact/delete', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.deleteContact)
     }
 }

@@ -6,8 +6,8 @@ export default class ContactsListRepository extends GenericRepository {
         this.dao = dao
     }
 
-    async getContacts (userId) {
-        const result = await this.dao.getContacts(userId)
+    async getContacts (userList) {
+        const result = await this.dao.getContacts(userList)
         return result
     }
 
@@ -41,8 +41,8 @@ export default class ContactsListRepository extends GenericRepository {
         return result
     }
 
-    async deleteContact(userId, contactId) {
-        const result = await this.dao.deleteContact(userId, contactId)
+    async deleteContact(userList, contactId) {
+        const result = await this.dao.deleteContact(userList, contactId)
         return result
     }
 }

@@ -1,18 +1,18 @@
 import contactsListModel from '../models/contactsList.model.js'
 
 export default class ContactsDAO {
-    getContacts = async (userId) => {
-        const result = await contactsListModel.find({_id: userId}, {state: 'accepted'}).lean()
+    getContacts = async (userList) => {
+        const result = await contactsListModel.find({_id: userList}, {'contacts.state': 'accepted'} ).lean()
         return result
     }
 
-    getContact = async (userId, contactId) => {
-        const result = await contactsListModel.findOne({_id: userId}, {'contacts.users': { $in: contactId }})
+    getContact = async (userList, contactId) => {
+        const result = await contactsListModel.findOne({_id: userList}, {'contacts.users': contactId}).lean()
         return result
     }
 
     getRequests = async (listId) => {
-            const result = await contactsListModel.find({_id: listId}, {'contacts.state': null}).lean()
+            const result = await contactsListModel.find({_id: listId}, {'contacts.state': 'pending'}).lean()
             return result
     }
     
@@ -22,27 +22,23 @@ export default class ContactsDAO {
     }
 
     addContact = async (userList, receptorId) => {
-        const result = await contactsListModel.findOneAndUpdate({_id: userList}, { $push: {contacts: {user: receptorId, state: null}}})
-        return result
-    }
-    //el _id debe ser de la lista persona.
-    sendRequest = async (receptorList, userId) => {
-        const result = await contactsListModel.findOneAndUpdate({_id: receptorList}, {$push: {contacts: {user: userId, state: null}}})
+        const result = await contactsListModel.findOneAndUpdate({_id: userList}, { $push: {contacts: {user: receptorId}}}, {new: true})
         return result
     }
 
-    /*
-    this function is used to accept other contacts
-    and change the owner state
-    */
+    sendRequest = async (receptorList, userId) => {
+        const result = await contactsListModel.findOneAndUpdate({_id: receptorList}, {$push: {contacts: {user: userId}}})
+        return result
+    }
+
     acceptContact = async (userId, contactId) => {
         const result = await contactsListModel.findOneAndUpdate({_id: userId, 'contacts.user': contactId}, { $set: { 'contacts.$.state': 'accepted' } })
         return result
     }
 
-    //this function is used to reject new contact
-    deleteContact = async (userId, contactId) => {
-        const result = await contactsListModel.findOneAndDelete({_id: userId, 'contacts.user': contactId})
+
+    deleteContact = async (userList, contactId) => {
+        const result = await contactsListModel.findOneAndUpdate({_id: userList, 'contacts.user': contactId}, {$pull: { contacts: { user: contactId }}})
         return result
     }
     
