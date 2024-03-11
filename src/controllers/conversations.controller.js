@@ -5,19 +5,6 @@ const conversationsService = new ConversationsService()
 
 export default class ConversationsController {
     
-    async getAllConvers(req, res) {
-        try {
-            const convers = await conversationsService.getAllConvers()
-
-            res.send({status: 'success', convers: convers})
-
-        } catch (error) {
-            if(error instanceof ElementNotFound){
-                return res.status(404).send({message: error.message})
-            }
-            res.status(500).send({message: error.message})
-        }
-    }
 
     async getConver(req, res) {
         try {
@@ -29,7 +16,7 @@ export default class ConversationsController {
             
             const conver = await conversationsService.getConver(converId)
 
-            res.send({status: 'success', conver: conver})
+            res.send({status: 'Success', conver: conver})
             
         } catch (error) {
             if(error instanceof ElementNotFound){
@@ -48,7 +35,7 @@ export default class ConversationsController {
 
             const conver = await conversationsService.getConverMessages(converId)
 
-            res.send({status: 'success', conver: conver})
+            res.send({status: 'Success', conver: conver})
 
         } catch (error) {
             if(error instanceof ElementNotFound){
@@ -67,7 +54,7 @@ export default class ConversationsController {
 
             const conver = await conversationsService.createConver({...req.body})
 
-            res.send({status: 'succes', conver})
+            res.send({status: 'Success', conver})
 
         } catch (error) {
             if(error instanceof ElementNotFound){
@@ -87,7 +74,7 @@ export default class ConversationsController {
 
             const result = await conversationsService.addUserToConver({...req.body})
             
-            res.send({status: 'succes', result})
+            res.send({status: 'Success', result})
 
         } catch (error) {
             if(error instanceof ElementNotFound){
@@ -110,7 +97,7 @@ export default class ConversationsController {
             
             await conversationsService.changeName(userId, name)
             
-            res.send({status: 'succes', message: 'Name changed'})
+            res.send({status: 'Success', message: 'Name changed'})
 
         } catch (error) {
             if(error instanceof ElementNotFound){
@@ -119,6 +106,7 @@ export default class ConversationsController {
             res.status(500).send({message: error.message})
         }
     }
+
     async changeState(req, res) {
         try {
             const { userId, state } = req.body
@@ -129,7 +117,7 @@ export default class ConversationsController {
 
             await conversationsService.changeState(userId, state)
 
-            res.send({status: 'succes', message: 'State changed'})
+            res.send({status: 'Success', message: 'State changed'})
 
         } catch (error) {
             if(error instanceof ElementNotFound){
@@ -138,6 +126,7 @@ export default class ConversationsController {
             res.status(500).send({message: error.message})
         }
     }
+    
     async deleteConver(req, res) {
         try {
             const { converId } = req.body
@@ -148,7 +137,7 @@ export default class ConversationsController {
 
             await conversationsService.deleteConver(converId)
 
-            res.send({status: 'succes', message: 'Conver deleted'})
+            res.send({status: 'Success', message: 'Conver deleted'})
 
         } catch (error) {
             if(error instanceof ElementNotFound){
@@ -157,4 +146,5 @@ export default class ConversationsController {
             res.status(500).send({message: error.message})
         }
     }
+    
 }

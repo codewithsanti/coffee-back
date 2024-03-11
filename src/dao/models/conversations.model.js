@@ -1,22 +1,22 @@
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
 const conversationCollection = 'conversations'
 
-const conversationSchema = new mongoose.Schema ({
+const conversationSchema = new Schema ({
     conversation_name: {
         type: String,
         default: ''
     },
     users: [ 
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'users'
         }
     ],
     messages: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'messages'
         }
     ],
@@ -25,7 +25,7 @@ const conversationSchema = new mongoose.Schema ({
         default: Date.now
     },
     created_by: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'users'
     },
     state: {
@@ -36,18 +36,24 @@ const conversationSchema = new mongoose.Schema ({
 
 })
 
-conversationSchema.pre('find', function(next){
-    this.populate('users messages')
-    next()
-})
+// conversationSchema.pre('find', function(next){
+//     this.populate('users messages')
+//     next()
+// })
+
+// conversationSchema.pre('findOne', function(next){
+//     this.populate('users')
+//     next()
+// })
+
 
 conversationSchema.pre('findOne', function(next){
-    this.populate('users')
+    this.populate('messages', '-_id')
     next()
 })
 
 conversationSchema.plugin(mongoosePaginate)
 
-const conversationModel = mongoose.model(conversationCollection,conversationSchema)
+const conversationModel = model(conversationCollection,conversationSchema)
 
 export default conversationModel

@@ -16,8 +16,14 @@ export default class UsersRepository extends GenericRepository {
         return result
     }
 
-    async addConver (userId, converId) {
+    
+    async addConverToUser (userId, converId) {
         const result = await this.dao.addConver(userId, converId)
+        return result
+    }
+    
+    async addContactList (userId, contactList) {
+        const result = await this.dao.addContactList(userId, contactList)
         return result
     }
 

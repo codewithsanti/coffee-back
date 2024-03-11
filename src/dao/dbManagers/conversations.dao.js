@@ -1,10 +1,6 @@
 import conversationModel from '../models/conversations.model.js'
 
 export default class ConversationsDAO {
-    getAllConvers = async () => { 
-        const result = await conversationModel.find().lean()
-        return result
-    }
 
     getConverMessages = async (converId) => {
         const result = await conversationModel.findOne({_id: converId}, 'messages').lean()
@@ -22,7 +18,7 @@ export default class ConversationsDAO {
     }
 
     addUserToConver = async (converId, userId) => {
-        const result = await conversationModel.findOneAndUpdate({_id: converId}, {$push: {users:userId}})
+        const result = await conversationModel.findOneAndUpdate({_id: converId}, {$push: { users:userId }})
         return result
     }
 

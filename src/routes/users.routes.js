@@ -20,8 +20,7 @@ export default class UsersRoutes extends Router{
         this.patch('/user/lastname', ['USER', 'ADMIN'], customStrategy.JWT, usersController.changeLastName)
         //
         this.patch('/user/email-register', ['USER', 'ADMIN'], customStrategy.JWT, usersController.changeEmailRegister)
-        //No existe email secondario en el modelo
-        //this.patch('/user/emai-secondary', ['USER', 'ADMIN'], customStrategy.JWT, usersController.changeEmailSecondary)
+        
         this.patch('/user/visibility', ['USER', 'ADMIN'], customStrategy.JWT, usersController.changeVisibility)
         this.patch('/user/avatar', ['USER', 'ADMIN'], customStrategy.JWT, usersController.changeAvatar)
 

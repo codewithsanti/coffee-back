@@ -5,12 +5,7 @@ export default class ConversationsRepository extends GenericRepository {
         super(dao)
         this.dao = dao
     }
-
-    async getConvers (converId) {
-        const result = await this.dao.getConvers(converId)
-        return result
-    }
-
+    
     async getConverMessages (converId) {
         const result = await this.dao.getConverMessages(converId)
         return result

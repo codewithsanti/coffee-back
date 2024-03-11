@@ -1,30 +1,31 @@
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
 const messageCollection = 'messages'
 
-const messageSchema = new mongoose.Schema({
+const messageSchema = new Schema({
     sender: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'users',
         unique: false
     },
     receivers: [ 
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref:'users'
         }
     ],
     conversation: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'conversations'
     },
     content: {
         type: String,
-        date: { created_at: {
-            type: Date,
-            default: Date.now
-        }}
+        
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
     },
     state: {
         type: String,
@@ -33,21 +34,22 @@ const messageSchema = new mongoose.Schema({
 
 })
 
-//messageSchema.index({ sender: 1 }, { unique: false })
 
-messageSchema.pre('find', function(){
-    this.populate('sender')
-        .populate('receiver')
-        .populate('conversation')
+messageSchema.pre('find', function(next){
+    this.populate('sender', '-_id first_name nickname')
+        .populate('receivers', '-_id first_name nickname')
+        .populate('conversation', '_id')
+    next()
 })
 
 
-messageSchema.pre('findOne', function(){
+messageSchema.pre('findOne', function(next){
     this.populate('receiver')
+    next()
 })
 
 messageSchema.plugin(mongoosePaginate)
 
-const messageModel = mongoose.model(messageCollection, messageSchema)
+const messageModel = model(messageCollection, messageSchema)
 
 export default messageModel

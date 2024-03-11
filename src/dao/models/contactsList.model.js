@@ -1,31 +1,35 @@
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
 const contactsListCollection = 'contactsList'
 
-const contactListSchema = new mongoose.Schema({
+const contactListSchema = new Schema({
+    owner_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'users'
+    },
     contacts: [
         {
             user: {
-                type: mongoose.Schema.Types.ObjectId,
+                type: Schema.Types.ObjectId,
                 ref: 'users'
             },
-            state:{
+            state: {
                 type: String,
                 enum:['accepted', 'blocked', 'pending'],
                 default: 'pending'
             },
-            _id: false
+            _id: false,
+            
         }
     ],
     created_at: {
         type: Date,
         default: Date.now
-    },
-    
+    }
 })
 
-contactListSchema.pre('find', function(next){
+contactListSchema.pre('findOne', function(next){
     this.populate('contacts.user', 'first_name last_name nickname avatar_url')
     next()
 })
@@ -34,6 +38,6 @@ contactListSchema.pre('find', function(next){
 contactListSchema.plugin(mongoosePaginate)
 
 
-const contactsListModel= new mongoose.model(contactsListCollection, contactListSchema)
+const contactsListModel= model(contactsListCollection, contactListSchema)
 
 export default contactsListModel

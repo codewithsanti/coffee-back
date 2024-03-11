@@ -7,7 +7,7 @@ export default class UsersController{
         try {
             const users = await usersService.getUsers()
 
-            res.send({status: 'success', users})
+            res.send({status: 'Success', users})
 
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -19,15 +19,15 @@ export default class UsersController{
 
     async getById (req, res) {
         try {
-            const { userId } = req.body
-            
+            const userId = req.user._id
+
             if(!userId) {
                 return res.status(400).send({message: `Missing fields`})
             }
 
             const user = await usersService.getById(userId)
 
-            res.send({status: 'success', user})
+            res.send({status: 'Success', user})
 
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -47,7 +47,7 @@ export default class UsersController{
             
             const register = await usersService.register({ ...req.body })
 
-            res.send({status: 'success', register})
+            res.send({status: 'Success', register})
         
 
         } catch (error) {
@@ -83,41 +83,17 @@ export default class UsersController{
         }
     }
 
-    async addConver (req, res) {
-        try {
-            const { userId, converId } = req.body
-
-            if( !userId || !converId){
-                return res.status(400).send({message: `Incomplete values`})
-            }
-
-            await usersService.addConver({...req.body})
-
-            res.send({status: 'success'})
-            
-        } catch (error) {
-            if(error instanceof UserNotFound){
-                return res.status(404).send({message: error.message})
-            }
-            if(error instanceof ElementNotFound){
-                return res.status(404).send({message: error.message})
-            }
-            res.status(500).send({message: error.message})
-        }
-    }
-
-
     async getConvers (req, res) {
         try {
-            const { userId } = req.body
-
+            const userId = req.user._id
+            
             if( !userId ){
-                return res.status(400).send({message: `Incomplete values`})
+                return res.status(403).send({message: `Forbidden`})
             }
 
             const convers = await usersService.getConvers(userId)
 
-            res.send({status: 'success', convers})
+            res.send({status: 'Success', convers})
             
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -132,15 +108,19 @@ export default class UsersController{
 
     async changeNickName (req, res) {
         try {
-            const { userId, nickName } = req.body
+            const { nickname } = req.body
+            const userId = req.user._id
 
-            if( !userId || !nickName ){
+            if(!nickname){
                 return res.status(400).send({message: `Incomplete values`})
             }
+            if(!userId){
+                return res.status(403).send({message: `Forbidden`})
+            }
 
-            const user = await usersService.changeNickName({...req.body})
+            const user = await usersService.changeNickName(userId, nickname)
 
-            res.send({status: 'success', message: `User nickname has benn changed to ${user.nickname}`})
+            res.send({status: 'Success', message: `User nickname has benn changed to ${user.nickname}`})
 
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -152,15 +132,20 @@ export default class UsersController{
 
     async changeFirstName (req, res) {
         try {
-            const { userId, firstName } = req.body
-
-            if( !userId || !firstName ){
+            const { firstName } = req.body
+            const userId = req.user._id
+            
+            if( !firstName ){
                 return res.status(400).send({message: `Incomplete values`})
             }
 
-            const user = await usersService.changeFirstName({...req.body})
+            if(!userId){
+                return res.status(403).send({message: `Forbidden`})
+            }
+
+            const user = await usersService.changeFirstName(userId, firstName)
             
-            res.send({status: 'success', message: `User first name has been changed to ${user.first_name}`})
+            res.send({status: 'Success', message: `User first name has been changed to ${user.first_name}`})
 
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -172,15 +157,19 @@ export default class UsersController{
 
     async changeLastName (req, res) {
         try {
-            const { userId, lastName } = req.body
+            const { lastName } = req.body
+            const userId = req.user._id
 
-            if( !userId || !lastName ){
+            if(!lastName ){
                 return res.status(400).send({message: `Missing fields`})
             }
+            if(!userId){
+                return res.status(403).send({message: `Forbidden`})
+            }
 
-            const user = await usersService.changeLastName({...req.body})
+            const user = await usersService.changeLastName(userId, lastName)
             
-            res.send({status: 'success', message: `User lastname has been changed to ${user.last_name}`})
+            res.send({status: 'Success', message: `User lastname has been changed to ${user.last_name}`})
 
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -192,39 +181,22 @@ export default class UsersController{
 
     async changeEmailRegister (req, res) {
         try {
-            const { userId, emailRegister } = req.body
+            const { emailRegister } = req.body
+            const userId = req.user._id
 
-            if( !userId || !emailRegister){
+            if(!emailRegister){
                 return res.status(404).send({message: error.message})
+            }
+            
+            if(!userId){
+                return res.status(403).send({message: `Forbidden`})
             }
 
             await usersService.changeEmailRegister(userId, emailRegister)
 
-            res.send({status: 'succes', message: 'Email changed succesfully'})
+            res.send({status: 'Success', message: 'Email changed succesfully'})
         } catch (error) {
             if(error instanceof UserNotFound){
-                return res.status(404).send({message: error.message})
-            }
-            res.status(500).send({message: error.message})
-        }
-    }
-
-    async changeEmailSecondary (req, res) {
-        try {
-            const { userId, emailSecondary } = req.body
-
-            if( !userId || !emailSecondary){
-                return res.status(404).send({message: error.message})
-            }
-
-            await usersService.changeEmailSecondary(userId, emailSecondary)
-
-            res.send({status: 'succes', message: 'Email changed succesfully'})
-        } catch (error) {
-            if(error instanceof UserNotFound){
-                return res.status(404).send({message: error.message})
-            }
-            if(error instanceof ElementAlreadyExist){
                 return res.status(404).send({message: error.message})
             }
             res.status(500).send({message: error.message})
@@ -233,15 +205,20 @@ export default class UsersController{
 
     async changeVisibility (req, res) {
         try {
-            const { userId, visibility } = req.body
+            const { visibility } = req.body
+            const userId = req.user._id
 
-            if( !userId || !visibility){
+            if(!visibility){
                 return res.status(404).send({message: error.message})
+            }
+
+            if(!userId){
+                return res.status(403).send({message: `Forbidden`})
             }
 
             await usersService.changeVisibility(userId, visibility)
 
-            res.send({status: 'succes', message: 'Visibility changed succesfully'})
+            res.send({status: 'Success', message: 'Visibility changed succesfully'})
         } catch (error) {
             if(error instanceof UserNotFound){
                 return res.status(404).send({message: error.message})
@@ -255,15 +232,20 @@ export default class UsersController{
     
     async changeAvatar (req, res) {
         try {
-            const { userId, avatar } = req.body
+            const { avatar } = req.body
+            const userId = req.user._id
 
-            if( !userId ||!avatar){
+            if(!avatar){
                 return res.status(404).send({mesage: 'Missing fields'})
+            }
+
+            if(!userId){
+                return res.status(403).send({message: `Forbidden`})
             }
 
             await usersService.changeAvatar(userId, avatar)
 
-            res.send({status: 'succes', message: 'The avatar has changed'})
+            res.send({status: 'Success', message: 'The avatar has changed'})
             
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -276,18 +258,22 @@ export default class UsersController{
         }
     }
 
-
     async deleteUser (req, res) {
         try {
-            const { userId } = req.body
+            const userId = req.user._id
+            const { userToDelete } = req.body
 
             if(!userId){
+                return res.status(403).send({message: `Forbidden`})
+            }
+
+            if(!userToDelete){
                 return res.status(400).send({message: `Missing fields`})
             }
 
-            const userDelete = await  usersService.deleteUser(userId)
+            const userDelete = await  usersService.deleteUser(userToDelete)
 
-            res.send({status: 'succes', message: `User with ID${userDelete._id} was deleted`})
+            res.send({status: 'Success', message: `User with ID${userDelete._id} was deleted`})
 
         } catch (error) {
             if(error instanceof UserNotFound){

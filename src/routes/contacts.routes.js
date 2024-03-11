@@ -10,10 +10,10 @@ export default class ContactsRoutes extends Router {
 
         this.get('/requests', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.getRequests)
 
-        this.post('/contact/add', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.addContact)
+        this.patch('/contact/add', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.addContact)
 
-        this.post('/contact/accept', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.acceptContact)
+        this.patch('/contact/accept', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.acceptContact)
         
-        this.post('/contact/delete', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.deleteContact)
+        this.patch('/contact/delete', ['USER', 'ADMIN'], customStrategy.JWT, contactsController.deleteContact)
     }
 }

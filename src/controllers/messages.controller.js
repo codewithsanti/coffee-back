@@ -6,15 +6,20 @@ export default class MessagesController {
 
     async create (req,res) {
         try {
-            const { sender, receivers, content } = req.body
+            const { receiver, conversation, content } = req.body
+            const sender = req.user._id
+            
+            if(!sender){
+                return res.status(403).send({message: `Forbidden`})
+            }
 
-            if( !sender || !receivers || !content ){
+            if( !receiver || !content ){
                 return res.status(400).send({message: 'Missing fields'})
             }
 
-            await messagesService.create({...req.body})
+            await messagesService.create({sender, ...req.body})
 
-            res.send({status: 'succes', message: 'Message created succesfully'})
+            res.send({status: 'Success', message: 'Message created succesfully'})
 
         } catch (error) {
             if(error instanceof UserNotFound){
@@ -38,7 +43,7 @@ export default class MessagesController {
 
             await messagesService.changeState({...req.body})
 
-            res.send({status: 'succes', message: 'Status changed succesfully'})
+            res.send({status: 'Success', message: 'Status changed succesfully'})
 
         } catch (error) {
             if(error instanceof ElementNotFound){
@@ -47,4 +52,5 @@ export default class MessagesController {
             res.status(500).send({message: error.message})
         }
     }
+    
 }

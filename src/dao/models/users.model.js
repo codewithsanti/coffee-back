@@ -1,9 +1,9 @@
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
 const userCollection = 'users'
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     first_name: {
         type: String, 
         required: true
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
     },
     created_at:{
         type: Date,
-        date: new Date().toLocaleString()
+        date: Date.now
     },
     role: {
         type: String,
@@ -51,13 +51,13 @@ const userSchema = new mongoose.Schema({
     },
     conversations: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'conversations'
         }
     ],
     contact_list: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref:'contacts'
+            type: Schema.Types.ObjectId,
+            ref:'contactsList'
     }
 })
 
@@ -65,6 +65,6 @@ const userSchema = new mongoose.Schema({
 userSchema.plugin(mongoosePaginate)
 
 
-export const userModel = mongoose.model(userCollection, userSchema)
+export const userModel = model(userCollection, userSchema)
 
 

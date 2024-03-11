@@ -2,23 +2,14 @@ import { ElementNotFound, UserNotFound } from '../errors/error-exceptions.js'
 import { conversationsRepository, usersRepository } from '../repositories/index.js'
 export default class conversationsService {
     
-    async getAllConvers() {
-        const conversations = conversationsRepository.getAllConvers()
-
-        if(!conversations){
-            throw new ElementNotFound(`Conversations not found`)
-        }
-
-        return conversations
-    }
-
+  
     //Este método sólo debe traer información general para mostrar en
     //la lista de conversaciones
     async getConverMessages(converId) {
         const converMessages = conversationsRepository.getConverMessages(converId)
         
         if(!converMessages){
-            throw new ElementNotFound(`Conversation not found`)
+            throw new ElementNotFound(`Conversacion no encontrada`)
         }
 
         return converMessages
@@ -45,18 +36,19 @@ export default class conversationsService {
 
     async addUserToConver (userId, converId) {
         const userToAdd = await usersRepository.getUserById(userId)
-
+        const userToAddId = userToAdd._id
+        
         if (!userToAdd) {
-            throw new UserNotFound(`User ${user.first_name} not found`)
+            throw new UserNotFound(`Usuario con Id N°${user._id} no encontrado`)
         }
         
         const converExists = await conversationsRepository.getById(converId)
 
         if(!converExists) {
-            throw new ElementNotFound (`Conversation with ID N°${converId} not exist`)
+            throw new ElementNotFound (`La conversacion con Id N°${converId} no existe`)
         }
 
-        const result = await conversationsRepository.addUserToConver(converId, userToAdd._id)
+        const result = await conversationsRepository.addUserToConver(converId, userToAddId)
 
         return result
 
@@ -66,7 +58,7 @@ export default class conversationsService {
         const converExists = await conversationsRepository.getById(converId)
 
         if(!converExists) {
-            throw new ElementNotFound (`Conversation with ID N°${converId} not exist`)
+            throw new ElementNotFound (`La conversacion con Id N°${converId} no existe`)
         }
 
 
@@ -79,7 +71,7 @@ export default class conversationsService {
         const converExists = await conversationsRepository.getById(converId)
 
         if(!converExists) {
-            throw new ElementNotFound (`Conversation with ID N°${converId} not exist`)
+            throw new ElementNotFound (`La conversacion con Id N°${converId} no existe`)
         }
 
         const result = await conversationsRepository.changeState(converId, state)
@@ -91,7 +83,7 @@ export default class conversationsService {
         const converExists = await conversationsRepository.getById(converId)
 
         if(!converExists) {
-            throw new ElementNotFound (`Conversation with ID N°${converId} not exist`)
+            throw new ElementNotFound (`La conversacion con Id N°${converId} no existe`)
         }
         
         const result = await conversationsRepository.deleteConver(converId)
