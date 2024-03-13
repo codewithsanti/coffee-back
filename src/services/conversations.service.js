@@ -1,8 +1,6 @@
-import { ElementNotFound, UserNotFound } from '../errors/error-exceptions.js'
+import { ElementAlreadyExist, ElementNotFound, UserNotFound } from '../errors/error-exceptions.js'
 import { conversationsRepository, usersRepository } from '../repositories/index.js'
 export default class conversationsService {
-    
-  
     //Este método sólo debe traer información general para mostrar en
     //la lista de conversaciones
     async getConverMessages(converId) {
@@ -34,24 +32,27 @@ export default class conversationsService {
         return result
     }
 
-    async addUserToConver (userId, converId) {
-        const userToAdd = await usersRepository.getUserById(userId)
-        const userToAddId = userToAdd._id
+    async addUserToConver (converId, userId) {
+        const userToAdd = await usersRepository.getById(userId)
         
         if (!userToAdd) {
-            throw new UserNotFound(`Usuario con Id N°${user._id} no encontrado`)
+            throw new UserNotFound(`Usuario con Id N°${userId} no encontrado. No se ha podido agregar a la conversación`)
         }
-        
+
         const converExists = await conversationsRepository.getById(converId)
 
         if(!converExists) {
             throw new ElementNotFound (`La conversacion con Id N°${converId} no existe`)
         }
 
-        const result = await conversationsRepository.addUserToConver(converId, userToAddId)
-
-        return result
-
+        const isInConver = await conversationsRepository.isInConver(converId,userId)
+        
+        if(!isInConver) {
+            const result = await conversationsRepository.addUserToConver(converId, userId)
+            return result
+        } else{
+            throw new ElementAlreadyExist(`El usuario ya es participante en la conversación`)
+        }
     }
 
     async changeName(converId, name) {

@@ -50,7 +50,7 @@ export default class ContactsListService {
         const contact = await contactsListRepository.isContact(userId, contactId)
 
         if(contact){
-            throw new UserAlreadyExists(`El usuario ya pertenece a la lista de contactos`)
+            throw new UserAlreadyExists(`El usuario ya pertenece a la lista de contactos o tiene una solicitud enviada`)
         }
 
         const contacExists = await usersRepository.getById(contactId)

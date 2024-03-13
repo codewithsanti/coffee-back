@@ -1,7 +1,7 @@
 import { ElementNotFound, UserNotFound } from '../errors/error-exceptions.js'
-import ConversationsService from '../services/conversations.service.js'
-
-const conversationsService = new ConversationsService()
+//import ConversationsService from '../services/conversations.service.js'
+import { conversationsService } from '../services/index.js'
+//const conversationsService = new ConversationsService()
 
 export default class ConversationsController {
     
@@ -44,37 +44,38 @@ export default class ConversationsController {
         }
     }
 
-    async createConver(req, res) {
-        try {
-            const { users, messages, created_by } = req.body
+    // async createConver(req, res) {
+    //     try {
+    //         const { users, messages, created_by } = req.body
 
-            if( !users || !messages || created_by){
-                res.status(400).send({message: 'Missing fields'})
-            }
+    //         if( !users || !messages || created_by){
+    //             res.status(400).send({message: 'Missing fields'})
+    //         }
 
-            const conver = await conversationsService.createConver({...req.body})
+    //         const conver = await conversationsService.createConver({...req.body})
 
-            res.send({status: 'Success', conver})
+    //         res.send({status: 'Success', conver})
 
-        } catch (error) {
-            if(error instanceof ElementNotFound){
-                return res.status(404).send({message: error.message})
-            }
-            res.status(500).send({message: error.message})
-        }
-    }
+    //     } catch (error) {
+    //         if(error instanceof ElementNotFound){
+    //             return res.status(404).send({message: error.message})
+    //         }
+    //         res.status(500).send({message: error.message})
+    //     }
+    // }
 
     async addUserToConver(req, res) {
         try {
-            const { userId, converId } = req.body
-
-            if( !userId || !converId ){
-                res.status(400).send({message: 'Missing fields'})
+            const { invitedId, converId } = req.body
+            
+            
+            if( !converId || !invitedId ){
+                return res.status(400).send({message: 'Missing fields'})
             }
 
-            const result = await conversationsService.addUserToConver({...req.body})
+            await conversationsService.addUserToConver(converId, invitedId)
             
-            res.send({status: 'Success', result})
+            res.send({status: 'Success', message: 'The user has been added'})
 
         } catch (error) {
             if(error instanceof ElementNotFound){

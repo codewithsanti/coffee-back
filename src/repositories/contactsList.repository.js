@@ -11,11 +11,6 @@ export default class ContactsListRepository extends GenericRepository {
         return result
     }
 
-    // async getContact (userId, contactId) {
-    //     const result = await this.dao.getContact(userId, contactId)
-    //     return result
-    // }
-
     async isContact (userList, contactId) {
         const result = await this.dao.isContact(userList, contactId)
         return result

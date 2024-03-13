@@ -1,6 +1,6 @@
 import { UserNotFound, UserAlreadyExists, IncorrectLoginCredentials, ElementNotFound, ElementAlreadyExist} from '../errors/error-exceptions.js'
 import { generateToken, hashPass, verify } from '../utils/utils.js'
-import { usersRepository, contactsListRepository } from '../repositories/index.js'
+import { usersRepository, conversationsRepository, contactsListRepository } from '../repositories/index.js'
 
 export default class UsersService {
 
@@ -85,7 +85,7 @@ export default class UsersService {
         return result
     }
     
-    async addContactList (userId) {
+    async addContactList(userId) {
         const user = await usersRepository.getById(userId)
         
         if(!user){
@@ -98,6 +98,20 @@ export default class UsersService {
         return result
     }
 
+    async addConverToUser(userId, converId) {
+        const user = await usersRepository.getById(userId)
+
+        if(!user){
+            throw new UserNotFound(`Usuario con Id N°${userId} no encontrado`)
+        }
+
+        const convers = await usersRepository.getConvers(userId)
+        if(!convers.conversations.includes(converId)){
+            const result = await usersRepository.addConverToUser(userId, converId)
+            return result
+        }
+    }
+
     async getConvers(userId) {
         const user = await usersRepository.getById(userId)
 
@@ -107,7 +121,7 @@ export default class UsersService {
 
         const convers = await usersRepository.getConvers(userId)
 
-        if(!convers){
+        if(convers.length === 0){
             throw new ElementNotFound(`No hay conversaciones todavía`)
         }
 

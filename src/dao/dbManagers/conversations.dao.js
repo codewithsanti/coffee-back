@@ -8,7 +8,13 @@ export default class ConversationsDAO {
     }
 
     getById = async (converId) => {
-        const result = await conversationModel.findOne ({_id: converId}).lean()
+        const result = await conversationModel.findOne({_id: converId}).lean()
+        return result
+    }
+
+    isInConver = async (converId, userId) => {
+        const query = await conversationModel.findOne({_id: converId})
+        const result = query.users.includes(userId)
         return result
     }
 

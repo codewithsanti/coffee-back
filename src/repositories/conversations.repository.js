@@ -11,6 +11,11 @@ export default class ConversationsRepository extends GenericRepository {
         return result
     }
 
+    async isInConver (converId, userId) {
+        const result = await this.dao.isInConver(converId, userId)
+        return result
+    }
+
     async addUserToConver (converId, userId) {
         const result = await this.dao.addUserToConver(converId, userId)
         return result

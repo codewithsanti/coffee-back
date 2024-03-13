@@ -50,9 +50,13 @@ const userSchema = new Schema({
         enum: ['private', 'public', 'restricted', 'disabled']
     },
     conversations: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'conversations'
+        { 
+            conversation:
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'conversations'
+            },
+            _id: false
         }
     ],
     contact_list: {

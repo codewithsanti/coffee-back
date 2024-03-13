@@ -1,6 +1,8 @@
 import { UserNotFound, UserAlreadyExists, IncorrectLoginCredentials, ElementNotFound, ElementAlreadyExist} from '../errors/error-exceptions.js'
 import config from '../config/config.js'
+//import UsersService  from '../services/users.service.js'
 import { usersService } from '../services/index.js'
+//const usersService = new UsersService()
 
 export default class UsersController{
     async getUsers (req, res) {
